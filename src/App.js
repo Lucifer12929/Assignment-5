@@ -1,25 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import firebase from "./firebase";
+import Login from "./Login";
+import Dashboard from "./Dashboard";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "./redux/userActions";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
+  const [loading, setLoading] = useState(true);
+
+  console.log(user);
+  useEffect(() => {
+    firebase.auth().onAuthStateChanged((user) => {
+      dispatch(setUser(user));
+      setLoading(false);
+    });
+  }, [dispatch]);
+
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  }
+
+  // Add this useEffect to set user state to null on page load
+
+  return <div className="App">{user ? <Dashboard /> : <Login />}</div>;
 }
 
 export default App;
